@@ -3,118 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machine Inspection App</title>
+    <title>Detailed Machine Inspection</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap');
+        body { font-family: 'Prompt', sans-serif; background-color: #f1f5f9; }
+        .btn-active-pass { background-color: #059669 !important; color: white !important; border-color: #059669 !important; }
+        .btn-active-fail { background-color: #dc2626 !important; color: white !important; border-color: #dc2626 !important; }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen pb-10">
+<body class="pb-32">
 
-    <nav class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-50">
-        <h1 class="text-xl font-bold text-center">ระบบตรวจสอบเครื่องจักร</h1>
-    </nav>
+    <header class="bg-[#c20e1a] text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-clipboard-list text-xl"></i>
+                <h1 class="text-lg font-bold uppercase tracking-tight">Machine Audit: C324</h1>
+            </div>
+            <span class="text-[10px] bg-black/20 px-2 py-1 rounded">V.2.0</span>
+        </div>
+    </header>
 
-    <div class="max-w-md mx-auto p-4 space-y-6">
+    <main class="max-w-md mx-auto p-4 space-y-4">
         
-        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-            <div class="mb-4 text-blue-600"><i class="fas fa-qrcode text-4xl"></i></div>
-            <h2 class="text-lg font-semibold mb-2">ระบุเครื่องจักร</h2>
-            <button class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">สแกน QR Code</button>
-            <p class="text-gray-500 text-sm mt-2">เครื่องจักร: <span class="font-bold text-gray-800">MC-2024-A1</span></p>
-        </section>
-
-        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-lg font-semibold mb-4 flex items-center">
-                <i class="fas fa-clipboard-check mr-2 text-blue-500 text-sm"></i> รายการตรวจสอบ
-            </h2>
-            
-            <div class="space-y-4">
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span class="text-gray-700">1. สภาพสายพาน</span>
-                    <div class="flex gap-2">
-                        <button onclick="setResult(1, 'pass')" id="p1" class="btn-status px-3 py-1 rounded bg-white border border-gray-200">ผ่าน</button>
-                        <button onclick="setResult(1, 'fail')" id="f1" class="btn-status px-3 py-1 rounded bg-white border border-gray-200 text-red-500">พบปัญหา</button>
+        <div id="checklist-container" class="space-y-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-4">
+                    <p class="text-sm font-medium text-gray-800 mb-4">1. ตรวจสอบระดับน้ำมันหล่อลื่น</p>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <button onclick="handleStatus(1, 'pass')" id="p1" class="py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-500 bg-gray-50 transition-all">ผ่าน (Pass)</button>
+                        <button onclick="handleStatus(1, 'fail')" id="f1" class="py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-500 bg-gray-50 transition-all">ไม่ผ่าน (Fail)</button>
                     </div>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span class="text-gray-700">2. ระดับน้ำมัน</span>
-                    <div class="flex gap-2">
-                        <button onclick="setResult(2, 'pass')" id="p2" class="btn-status px-3 py-1 rounded bg-white border border-gray-200">ผ่าน</button>
-                        <button onclick="setResult(2, 'fail')" id="f2" class="btn-status px-3 py-1 rounded bg-white border border-gray-200 text-red-500">พบปัญหา</button>
+                    
+                    <div id="photo-area-1" class="hidden space-y-3 pt-3 border-t border-dashed border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <span id="photo-label-1" class="text-[10px] font-bold">แนบรูปภาพประกอบ</span>
+                            <span id="required-tag-1" class="hidden text-[10px] text-red-500 font-bold uppercase">จำเป็น!</span>
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <div class="w-16 h-16 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <textarea id="note-1" class="flex-1 text-xs p-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none" rows="2" placeholder="ระบุหมายเหตุ..."></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <section id="evidence-section" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hidden">
-            <h2 id="evidence-title" class="text-lg font-semibold mb-4">ข้อมูลเพิ่มเติม</h2>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm text-gray-600 mb-1">ถ่ายรูป (บังคับเมื่อพบปัญหา)</label>
-                    <div class="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50">
-                        <i class="fas fa-camera text-2xl text-gray-400"></i>
-                        <p class="text-xs text-gray-400 mt-1">คลิกเพื่ออัปโหลดรูป</p>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-4">
+                    <p class="text-sm font-medium text-gray-800 mb-4">2. สภาพสายพานและโซ่</p>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <button onclick="handleStatus(2, 'pass')" id="p2" class="py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-500 bg-gray-50 transition-all">ผ่าน (Pass)</button>
+                        <button onclick="handleStatus(2, 'fail')" id="f2" class="py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-500 bg-gray-50 transition-all">ไม่ผ่าน (Fail)</button>
+                    </div>
+                    
+                    <div id="photo-area-2" class="hidden space-y-3 pt-3 border-t border-dashed border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <span id="photo-label-2" class="text-[10px] font-bold">แนบรูปภาพประกอบ</span>
+                            <span id="required-tag-2" class="hidden text-[10px] text-red-500 font-bold uppercase">จำเป็น!</span>
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <div class="w-16 h-16 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <textarea id="note-2" class="flex-1 text-xs p-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none" rows="2" placeholder="ระบุหมายเหตุ..."></textarea>
+                        </div>
                     </div>
                 </div>
-                <div id="defect-detail" class="hidden">
-                    <label class="block text-sm text-gray-600 mb-1">รายละเอียดปัญหา</label>
-                    <textarea class="w-full border border-gray-200 rounded-lg p-2 text-sm" placeholder="ระบุอาการที่พบ..."></textarea>
-                </div>
             </div>
-        </section>
+        </div>
 
-        <button onclick="submitReport()" class="w-full bg-green-500 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:bg-green-600 transition shadow-green-100">
-            ส่งรายงานการตรวจสอบ
-        </button>
+    </main>
 
+    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-gray-100">
+        <div class="max-w-md mx-auto">
+            <button onclick="submitAll()" class="w-full bg-[#c20e1a] text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-all">
+                บันทึกผลการตรวจสอบทั้งหมด
+            </button>
+        </div>
     </div>
 
     <script>
-        let hasDefect = false;
+        function handleStatus(id, status) {
+            const pBtn = document.getElementById(`p${id}`);
+            const fBtn = document.getElementById(`f${id}`);
+            const photoArea = document.getElementById(`photo-area-${id}`);
+            const photoLabel = document.getElementById(`photo-label-${id}`);
+            const reqTag = document.getElementById(`required-tag-${id}`);
 
-        function setResult(id, status) {
-            // Reset buttons in the row
-            document.getElementById('p'+id).className = 'px-3 py-1 rounded bg-white border border-gray-200';
-            document.getElementById('f'+id).className = 'px-3 py-1 rounded bg-white border border-gray-200 text-red-500';
-
-            const evidenceSection = document.getElementById('evidence-section');
-            const defectDetail = document.getElementById('defect-detail');
-            const evidenceTitle = document.getElementById('evidence-title');
+            // Reset classes
+            pBtn.className = fBtn.className = "py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-500 bg-gray-50 transition-all";
+            
+            // Show Photo Area
+            photoArea.classList.remove('hidden');
 
             if (status === 'pass') {
-                document.getElementById('p'+id).className = 'px-3 py-1 rounded bg-green-500 text-white';
-                // Check if all items are pass
-                checkGlobalStatus();
+                pBtn.classList.add('btn-active-pass');
+                photoLabel.innerText = "📸 ถ่ายรูปยืนยันสภาพ (ไม่บังคับ)";
+                photoLabel.className = "text-[10px] font-bold text-gray-400";
+                reqTag.classList.add('hidden');
             } else {
-                document.getElementById('f'+id).className = 'px-3 py-1 rounded bg-red-500 text-white';
-                hasDefect = true;
-                evidenceSection.classList.remove('hidden');
-                defectDetail.classList.remove('hidden');
-                evidenceTitle.innerText = "🚨 ข้อมูลความเสียหาย (บังคับถ่ายรูป)";
+                fBtn.classList.add('btn-active-fail');
+                photoLabel.innerText = "🚨 ถ่ายรูปจุดที่พบปัญหา";
+                photoLabel.className = "text-[10px] font-bold text-red-600";
+                reqTag.classList.remove('hidden');
             }
         }
 
-        function checkGlobalStatus() {
-            // Simple logic: if any fail exists, stay in defect mode
-            // If all pass, show optional photo
-            const evidenceSection = document.getElementById('evidence-section');
-            const defectDetail = document.getElementById('defect-detail');
-            const evidenceTitle = document.getElementById('evidence-title');
-
-            // Logic จำลอง: ถ้ายังไม่มีอันไหน Fail เลย ให้ขึ้นว่าถ่ายรูปได้ (Optional)
-            if (!hasDefect) {
-                evidenceSection.classList.remove('hidden');
-                defectDetail.classList.add('hidden');
-                evidenceTitle.innerText = "📸 ถ่ายรูปยืนยันสภาพ (ไม่บังคับ)";
-            }
-        }
-
-        function submitReport() {
-            if (hasDefect) {
-                alert("🔴 ระบบได้ทำการส่งการแจ้งเตือนไปยัง LINE และ Email ของหัวหน้างานแล้ว");
-            } else {
-                alert("✅ บันทึกข้อมูลสำเร็จ (สถานะปกติ)");
-            }
+        function submitAll() {
+            alert("บันทึกข้อมูลเรียบร้อย!\nรูปภาพจะถูกจัดเก็บแยกตามหัวข้อการตรวจ");
         }
     </script>
 </body>
