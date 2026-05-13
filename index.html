@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Inspection App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen pb-10">
+
+    <nav class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <h1 class="text-xl font-bold text-center">ระบบตรวจสอบเครื่องจักร</h1>
+    </nav>
+
+    <div class="max-w-md mx-auto p-4 space-y-6">
+        
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
+            <div class="mb-4 text-blue-600"><i class="fas fa-qrcode text-4xl"></i></div>
+            <h2 class="text-lg font-semibold mb-2">ระบุเครื่องจักร</h2>
+            <button class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">สแกน QR Code</button>
+            <p class="text-gray-500 text-sm mt-2">เครื่องจักร: <span class="font-bold text-gray-800">MC-2024-A1</span></p>
+        </section>
+
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-lg font-semibold mb-4 flex items-center">
+                <i class="fas fa-clipboard-check mr-2 text-blue-500 text-sm"></i> รายการตรวจสอบ
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="text-gray-700">1. สภาพสายพาน</span>
+                    <div class="flex gap-2">
+                        <button onclick="setResult(1, 'pass')" id="p1" class="btn-status px-3 py-1 rounded bg-white border border-gray-200">ผ่าน</button>
+                        <button onclick="setResult(1, 'fail')" id="f1" class="btn-status px-3 py-1 rounded bg-white border border-gray-200 text-red-500">พบปัญหา</button>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="text-gray-700">2. ระดับน้ำมัน</span>
+                    <div class="flex gap-2">
+                        <button onclick="setResult(2, 'pass')" id="p2" class="btn-status px-3 py-1 rounded bg-white border border-gray-200">ผ่าน</button>
+                        <button onclick="setResult(2, 'fail')" id="f2" class="btn-status px-3 py-1 rounded bg-white border border-gray-200 text-red-500">พบปัญหา</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="evidence-section" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hidden">
+            <h2 id="evidence-title" class="text-lg font-semibold mb-4">ข้อมูลเพิ่มเติม</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">ถ่ายรูป (บังคับเมื่อพบปัญหา)</label>
+                    <div class="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50">
+                        <i class="fas fa-camera text-2xl text-gray-400"></i>
+                        <p class="text-xs text-gray-400 mt-1">คลิกเพื่ออัปโหลดรูป</p>
+                    </div>
+                </div>
+                <div id="defect-detail" class="hidden">
+                    <label class="block text-sm text-gray-600 mb-1">รายละเอียดปัญหา</label>
+                    <textarea class="w-full border border-gray-200 rounded-lg p-2 text-sm" placeholder="ระบุอาการที่พบ..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <button onclick="submitReport()" class="w-full bg-green-500 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:bg-green-600 transition shadow-green-100">
+            ส่งรายงานการตรวจสอบ
+        </button>
+
+    </div>
+
+    <script>
+        let hasDefect = false;
+
+        function setResult(id, status) {
+            // Reset buttons in the row
+            document.getElementById('p'+id).className = 'px-3 py-1 rounded bg-white border border-gray-200';
+            document.getElementById('f'+id).className = 'px-3 py-1 rounded bg-white border border-gray-200 text-red-500';
+
+            const evidenceSection = document.getElementById('evidence-section');
+            const defectDetail = document.getElementById('defect-detail');
+            const evidenceTitle = document.getElementById('evidence-title');
+
+            if (status === 'pass') {
+                document.getElementById('p'+id).className = 'px-3 py-1 rounded bg-green-500 text-white';
+                // Check if all items are pass
+                checkGlobalStatus();
+            } else {
+                document.getElementById('f'+id).className = 'px-3 py-1 rounded bg-red-500 text-white';
+                hasDefect = true;
+                evidenceSection.classList.remove('hidden');
+                defectDetail.classList.remove('hidden');
+                evidenceTitle.innerText = "🚨 ข้อมูลความเสียหาย (บังคับถ่ายรูป)";
+            }
+        }
+
+        function checkGlobalStatus() {
+            // Simple logic: if any fail exists, stay in defect mode
+            // If all pass, show optional photo
+            const evidenceSection = document.getElementById('evidence-section');
+            const defectDetail = document.getElementById('defect-detail');
+            const evidenceTitle = document.getElementById('evidence-title');
+
+            // Logic จำลอง: ถ้ายังไม่มีอันไหน Fail เลย ให้ขึ้นว่าถ่ายรูปได้ (Optional)
+            if (!hasDefect) {
+                evidenceSection.classList.remove('hidden');
+                defectDetail.classList.add('hidden');
+                evidenceTitle.innerText = "📸 ถ่ายรูปยืนยันสภาพ (ไม่บังคับ)";
+            }
+        }
+
+        function submitReport() {
+            if (hasDefect) {
+                alert("🔴 ระบบได้ทำการส่งการแจ้งเตือนไปยัง LINE และ Email ของหัวหน้างานแล้ว");
+            } else {
+                alert("✅ บันทึกข้อมูลสำเร็จ (สถานะปกติ)");
+            }
+        }
+    </script>
+</body>
+</html>
