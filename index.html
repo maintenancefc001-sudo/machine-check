@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detailed Machine Inspection</title>
+    <title>Machine Inspection - FC225</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -11,6 +11,9 @@
         body { font-family: 'Prompt', sans-serif; background-color: #f1f5f9; }
         .btn-active-pass { background-color: #059669 !important; color: white !important; border-color: #059669 !important; }
         .btn-active-fail { background-color: #dc2626 !important; color: white !important; border-color: #dc2626 !important; }
+        .photo-done { border-color: #059669 !important; background-color: #ecfdf5 !important; color: #059669 !important; }
+        #historyModal { transition: all 0.3s ease-out; }
+        .modal-show { opacity: 1 !important; pointer-events: auto !important; }
     </style>
 </head>
 <body class="pb-32">
@@ -18,102 +21,198 @@
     <header class="bg-[#c20e1a] text-white p-4 shadow-lg sticky top-0 z-50">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <i class="fas fa-clipboard-list text-xl"></i>
-                <h1 class="text-lg font-bold uppercase tracking-tight">Machine Audit: C324</h1>
+                <i class="fas fa-shield-alt text-2xl"></i>
+                <div>
+                    <h1 class="text-lg font-bold leading-none uppercase">Inspection</h1>
+                    <span class="text-[10px] opacity-80 uppercase tracking-widest text-white/70">Digital Checklist System</span>
+                </div>
             </div>
-            <span class="text-[10px] bg-black/20 px-2 py-1 rounded">V.2.0</span>
+            <button onclick="toggleHistory()" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all">
+                <i class="fas fa-history text-sm"></i>
+            </button>
         </div>
     </header>
 
     <main class="max-w-md mx-auto p-4 space-y-4">
         
-        <div id="checklist-container" class="space-y-4">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-4">
-                    <p class="text-sm font-medium text-gray-800 mb-4">1. ตรวจสอบระดับน้ำมันหล่อลื่น</p>
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <button onclick="handleStatus(1, 'pass')" id="p1" class="py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-500 bg-gray-50 transition-all">ผ่าน (Pass)</button>
-                        <button onclick="handleStatus(1, 'fail')" id="f1" class="py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-500 bg-gray-50 transition-all">ไม่ผ่าน (Fail)</button>
-                    </div>
+        <div class="bg-white rounded-2xl shadow-sm border-t-4 border-[#c20e1a] p-5">
+            <div class="grid grid-cols-2 gap-y-4">
+                <div class="col-span-2">
+                    <h2 class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">รหัสเครื่องจักร (Machine ID)</h2>
+                    <p class="text-xl font-bold text-gray-800 italic">FC225</p>
+                </div>
+                <div>
+                    <h2 class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">ชื่อหน่วยผลิต (Unit)</h2>
+                    <p class="text-sm font-semibold text-gray-700">VRC concrete 1</p>
+                </div>
+                <div>
+                    <h2 class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">พนักงานตรวจสอบ (Name)</h2>
+                    <p class="text-sm font-semibold text-gray-700">สมชาย</p>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
+                <span class="text-[10px] text-gray-400 italic">อัปเดต: 14 พ.ค. 2026</span>
+                <span id="overallStatus" class="bg-gray-100 text-gray-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase">Pending</span>
+            </div>
+        </div>
+
+        <div id="check-list" class="space-y-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 transition-all">
+                <p class="text-sm font-medium text-gray-800 mb-4">1. ตรวจเช็คสภาพสายไฟและจุดต่อ</p>
+                <div class="grid grid-cols-2 gap-3 mb-2">
+                    <button onclick="handleStatus(1, 'pass')" id="p1" class="py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-400 bg-gray-50 transition-all">Pass</button>
+                    <button onclick="handleStatus(1, 'fail')" id="f1" class="py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-400 bg-gray-50 transition-all">Fail</button>
+                </div>
+                
+                <div id="photo-area-1" class="hidden space-y-3 pt-3 border-t border-dashed border-gray-100 mt-2">
+                    <p id="fail-msg-1" class="hidden text-[11px] text-red-600 font-bold italic animate-pulse">🚨 จำเป็นต้องถ่ายรูป! ถ่ายรูปจุดที่พบปัญหา</p>
                     
-                    <div id="photo-area-1" class="hidden space-y-3 pt-3 border-t border-dashed border-gray-100">
-                        <div class="flex items-center justify-between">
-                            <span id="photo-label-1" class="text-[10px] font-bold">แนบรูปภาพประกอบ</span>
-                            <span id="required-tag-1" class="hidden text-[10px] text-red-500 font-bold uppercase">จำเป็น!</span>
-                        </div>
-                        <div class="flex gap-2 items-center">
-                            <div class="w-16 h-16 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400">
-                                <i class="fas fa-camera"></i>
-                            </div>
-                            <textarea id="note-1" class="flex-1 text-xs p-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none" rows="2" placeholder="ระบุหมายเหตุ..."></textarea>
-                        </div>
+                    <div class="flex gap-3">
+                        <div onclick="capturePhoto(1)" id="photo-box-1" class="w-16 h-16 bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400 cursor-pointer overflow-hidden"><i class="fas fa-camera text-lg"></i></div>
+                        <textarea id="note-1" class="flex-1 text-xs p-2 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none" rows="2" placeholder="ระบุรายละเอียดอาการ..."></textarea>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-4">
-                    <p class="text-sm font-medium text-gray-800 mb-4">2. สภาพสายพานและโซ่</p>
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <button onclick="handleStatus(2, 'pass')" id="p2" class="py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-500 bg-gray-50 transition-all">ผ่าน (Pass)</button>
-                        <button onclick="handleStatus(2, 'fail')" id="f2" class="py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-500 bg-gray-50 transition-all">ไม่ผ่าน (Fail)</button>
-                    </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 transition-all">
+                <p class="text-sm font-medium text-gray-800 mb-4">2. ทดสอบระบบหยุดฉุกเฉิน (E-Stop)</p>
+                <div class="grid grid-cols-2 gap-3 mb-2">
+                    <button onclick="handleStatus(2, 'pass')" id="p2" class="py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-400 bg-gray-50 transition-all">Pass</button>
+                    <button onclick="handleStatus(2, 'fail')" id="f2" class="py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-400 bg-gray-50 transition-all">Fail</button>
+                </div>
+                
+                <div id="photo-area-2" class="hidden space-y-3 pt-3 border-t border-dashed border-gray-100 mt-2">
+                    <p id="fail-msg-2" class="hidden text-[11px] text-red-600 font-bold italic animate-pulse">🚨 จำเป็นต้องถ่ายรูป! ถ่ายรูปจุดที่พบปัญหา</p>
                     
-                    <div id="photo-area-2" class="hidden space-y-3 pt-3 border-t border-dashed border-gray-100">
-                        <div class="flex items-center justify-between">
-                            <span id="photo-label-2" class="text-[10px] font-bold">แนบรูปภาพประกอบ</span>
-                            <span id="required-tag-2" class="hidden text-[10px] text-red-500 font-bold uppercase">จำเป็น!</span>
-                        </div>
-                        <div class="flex gap-2 items-center">
-                            <div class="w-16 h-16 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400">
-                                <i class="fas fa-camera"></i>
-                            </div>
-                            <textarea id="note-2" class="flex-1 text-xs p-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none" rows="2" placeholder="ระบุหมายเหตุ..."></textarea>
-                        </div>
+                    <div class="flex gap-3">
+                        <div onclick="capturePhoto(2)" id="photo-box-2" class="w-16 h-16 bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400 cursor-pointer overflow-hidden"><i class="fas fa-camera text-lg"></i></div>
+                        <textarea id="note-2" class="flex-1 text-xs p-2 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none" rows="2" placeholder="ระบุรายละเอียดอาการ..."></textarea>
                     </div>
                 </div>
             </div>
         </div>
-
     </main>
 
-    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-gray-100">
+    <div id="historyModal" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 opacity-0 pointer-events-none">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl">
+            <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-gray-800">ประวัติการตรวจสอบล่าสุด</h3>
+                <button onclick="toggleHistory()" class="w-8 h-8 flex items-center justify-center text-gray-400"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="historyContent" class="p-4 max-h-[60vh] overflow-y-auto space-y-3"></div>
+            <div class="p-4 bg-gray-50 border-t">
+                <button onclick="clearHistory()" class="w-full py-2 text-xs text-red-500 font-medium">ล้างประวัติทั้งหมด</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-gray-100 z-40">
         <div class="max-w-md mx-auto">
-            <button onclick="submitAll()" class="w-full bg-[#c20e1a] text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-all">
-                บันทึกผลการตรวจสอบทั้งหมด
+            <button onclick="submitReport()" class="w-full bg-[#c20e1a] text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-all">
+                ส่งรายงานการตรวจสอบ
             </button>
         </div>
     </div>
 
     <script>
+        let results = {}; 
+        let photos = {};  
+
         function handleStatus(id, status) {
+            results[id] = status;
             const pBtn = document.getElementById(`p${id}`);
             const fBtn = document.getElementById(`f${id}`);
             const photoArea = document.getElementById(`photo-area-${id}`);
-            const photoLabel = document.getElementById(`photo-label-${id}`);
-            const reqTag = document.getElementById(`required-tag-${id}`);
-
-            // Reset classes
-            pBtn.className = fBtn.className = "py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-500 bg-gray-50 transition-all";
+            const failMsg = document.getElementById(`fail-msg-${id}`);
             
-            // Show Photo Area
+            pBtn.className = fBtn.className = "py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-400 bg-gray-50 transition-all";
             photoArea.classList.remove('hidden');
 
             if (status === 'pass') {
                 pBtn.classList.add('btn-active-pass');
-                photoLabel.innerText = "📸 ถ่ายรูปยืนยันสภาพ (ไม่บังคับ)";
-                photoLabel.className = "text-[10px] font-bold text-gray-400";
-                reqTag.classList.add('hidden');
+                failMsg.classList.add('hidden');
             } else {
                 fBtn.classList.add('btn-active-fail');
-                photoLabel.innerText = "🚨 ถ่ายรูปจุดที่พบปัญหา";
-                photoLabel.className = "text-[10px] font-bold text-red-600";
-                reqTag.classList.remove('hidden');
+                failMsg.classList.remove('hidden'); // แสดงข้อความเตือน🚨
+            }
+            updateOverallStatus();
+        }
+
+        function capturePhoto(id) {
+            photos[id] = true;
+            const box = document.getElementById(`photo-box-${id}`);
+            box.classList.add('photo-done');
+            box.innerHTML = '<i class="fas fa-check text-lg"></i>';
+        }
+
+        function updateOverallStatus() {
+            const hasFail = Object.values(results).includes('fail');
+            const overall = document.getElementById('overallStatus');
+            if (hasFail) {
+                overall.innerText = "Abnormal";
+                overall.className = "bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase";
+            } else {
+                overall.innerText = "Ready";
+                overall.className = "bg-green-100 text-green-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase";
             }
         }
 
-        function submitAll() {
-            alert("บันทึกข้อมูลเรียบร้อย!\nรูปภาพจะถูกจัดเก็บแยกตามหัวข้อการตรวจ");
+        function submitReport() {
+            const itemIds = [1, 2];
+            for (let id of itemIds) {
+                if (!results[id]) { alert(`❌ กรุณาตรวจสอบข้อที่ ${id} ให้ครบก่อนครับ`); return; }
+                if (results[id] === 'fail' && !photos[id]) { 
+                    alert(`🚨 ข้อที่ ${id} พบปัญหา แต่ยังไม่ได้ถ่ายรูป!\nกรุณาถ่ายรูปจุดที่พบปัญหาก่อนส่งรายงานครับ`); 
+                    return; 
+                }
+            }
+
+            // บันทึกลงประวัติ
+            const report = {
+                machine: "FC225",
+                timestamp: new Date().toLocaleString('th-TH'),
+                status: Object.values(results).includes('fail') ? "Abnormal" : "Pass"
+            };
+
+            let history = JSON.parse(localStorage.getItem('inspect_log') || "[]");
+            history.unshift(report);
+            localStorage.setItem('inspect_log', JSON.stringify(history.slice(0, 20)));
+
+            alert("✅ ส่งรายงานสำเร็จ!");
+            location.reload();
+        }
+
+        function toggleHistory() {
+            const modal = document.getElementById('historyModal');
+            modal.classList.toggle('modal-show');
+            if(modal.classList.contains('modal-show')) renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyContent');
+            const history = JSON.parse(localStorage.getItem('inspect_log') || "[]");
+            if (history.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 text-sm py-10">ยังไม่มีข้อมูล</p>';
+                return;
+            }
+            container.innerHTML = history.map(item => `
+                <div class="bg-gray-50 border border-gray-100 p-3 rounded-xl flex justify-between items-center">
+                    <div>
+                        <p class="text-xs font-bold text-gray-700">เครื่อง: ${item.machine}</p>
+                        <p class="text-[10px] text-gray-400">${item.timestamp}</p>
+                    </div>
+                    <span class="text-[9px] font-bold px-2 py-1 rounded-full uppercase ${item.status === 'Pass' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
+                        ${item.status}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function clearHistory() {
+            if(confirm("ยืนยันการล้างประวัติ?")) {
+                localStorage.removeItem('inspect_log');
+                renderHistory();
+            }
         }
     </script>
 </body>
